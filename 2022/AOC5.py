@@ -52,5 +52,5 @@ print(
     f"""Part 1: {"".join(map(lambda x: x[-1], process_instructions(instructions, crates, "CrateMover 9000")))}"""
 )
 print(
-    f"""Part 1: {"".join(map(lambda x: x[-1], process_instructions(instructions, crates, "CrateMover 9001")))}"""
+    f"""Part 2: {"".join(map(lambda x: x[-1], process_instructions(instructions, crates, "CrateMover 9001")))}"""
 )
