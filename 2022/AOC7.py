@@ -24,7 +24,7 @@ for line in open("7").readlines():
             (cwd / name).write_text(size)
 
 dir_sizes = {
-    dir: sum(map(int, [p.read_text() for p in dir.glob("**/*") if p.is_file()]))
+    dir: sum(int(p.read_text()) for p in dir.glob("**/*") if p.is_file())
     for dir in root.glob("**")
 }
 unused_space = 70_000_000 - dir_sizes[root]
