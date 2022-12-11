@@ -11,15 +11,6 @@ class Monkey:
         return f"<Monkey with items {self.items}. {self.n_inspected=}"
 
 
-# Lambdas cannot be dynamically defined in match block (they end up )
-def worry_adder(add_amt: int):
-    return lambda x: x + add_amt
-
-
-def worry_multiplier(mult_amt: int):
-    return lambda x: x * mult_amt
-
-
 def shenanigans(boredom_relief: bool, rounds: int) -> int:
     monkeys = []
     mod = 1
@@ -34,9 +25,9 @@ def shenanigans(boredom_relief: bool, rounds: int) -> int:
             case ["Operation:", "new", "=", "old", "*", "old"]:
                 monkeys[-1].operation = lambda x: x**2
             case ["Operation:", "new", "=", "old", "*", mult_amt]:
-                monkeys[-1].operation = worry_multiplier(int(mult_amt))
+                monkeys[-1].operation = lambda x, mult_amt=int(mult_amt): x * mult_amt
             case ["Operation:", "new", "=", "old", "+", add_amt]:
-                monkeys[-1].operation = worry_adder(int(add_amt))
+                monkeys[-1].operation = lambda x, add_amt=int(add_amt): x + add_amt
             case ["Test:", "divisible", "by", divisor]:
                 monkeys[-1].test = int(divisor)
                 mod *= int(divisor)
