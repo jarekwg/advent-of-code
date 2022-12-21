@@ -88,72 +88,62 @@ def relieve_pressure(train_elephant: bool) -> int:
             valves_left=set(valves_with_nonzero_flow_rate),
         )
     ]
-    # depth = 0
-    # pruned = 0
     while to_explore:
-        # depth += 1
-        # print(
-        #     f"Depth {depth}, exploring {len(to_explore)} branches ({pruned} pruned).",
-        # )
-        next_to_explore = []
-        # pruned = 0
-        for branch in to_explore:
-            if branch.naive_best_case_score < top_score:
-                # pruned += 1
-                continue
+        branch = to_explore.pop()
+        if branch.naive_best_case_score < top_score:
+            continue
 
-            def add_branch(my_valve: Valve, ele_valve: Valve):
-                my_time_left = (
-                    (
-                        branch.my_time_left
-                        - time_to_reach_and_open_valve(branch.my_valve, my_valve)
-                    )
-                    if my_valve != branch.my_valve
-                    else 0
+        def add_branch(my_valve: Valve, ele_valve: Valve):
+            my_time_left = (
+                (
+                    branch.my_time_left
+                    - time_to_reach_and_open_valve(branch.my_valve, my_valve)
                 )
-                ele_time_left = (
-                    (
-                        branch.ele_time_left
-                        - time_to_reach_and_open_valve(branch.ele_valve, ele_valve)
-                    )
-                    if ele_valve != branch.ele_valve
-                    else 0
+                if my_valve != branch.my_valve
+                else 0
+            )
+            ele_time_left = (
+                (
+                    branch.ele_time_left
+                    - time_to_reach_and_open_valve(branch.ele_valve, ele_valve)
                 )
-                next_branch = Branch(
-                    my_valve,
-                    ele_valve,
-                    my_time_left,
-                    ele_time_left,
-                    branch.score
-                    + my_time_left * my_valve.flow_rate
-                    + ele_time_left * ele_valve.flow_rate,
-                    valves_left=branch.valves_left - {my_valve, ele_valve},
-                )
-                next_to_explore.append(next_branch)
-                global top_score
-                if (new_score := next_branch.score) > top_score:
-                    top_score = new_score
-                    # print(f"-----------New top score {top_score}")
+                if ele_valve != branch.ele_valve
+                else 0
+            )
+            next_branch = Branch(
+                my_valve,
+                ele_valve,
+                my_time_left,
+                ele_time_left,
+                branch.score
+                + my_time_left * my_valve.flow_rate
+                + ele_time_left * ele_valve.flow_rate,
+                valves_left=branch.valves_left - {my_valve, ele_valve},
+            )
+            to_explore.append(next_branch)
+            global top_score
+            if (new_score := next_branch.score) > top_score:
+                top_score = new_score
+                # print(f"-----------New top score {top_score}")
 
-            if branch.my_valve == branch.ele_valve and train_elephant:
-                for my_valve, ele_valve in combinations(branch.valves_left, 2):
-                    # We both move (doesn't matter who goes to which in the pair).
+        if branch.my_valve == branch.ele_valve and train_elephant:
+            for my_valve, ele_valve in combinations(branch.valves_left, 2):
+                # We both move (doesn't matter who goes to which in the pair).
+                add_branch(my_valve, ele_valve)
+        else:
+            if branch.my_time_left >= 2 and branch.ele_time_left >= 2:
+                for my_valve, ele_valve in permutations(branch.valves_left, 2):
+                    # We both move.
                     add_branch(my_valve, ele_valve)
-            else:
-                if branch.my_time_left >= 2 and branch.ele_time_left >= 2:
-                    for my_valve, ele_valve in permutations(branch.valves_left, 2):
-                        # We both move.
-                        add_branch(my_valve, ele_valve)
-                if branch.my_time_left >= 2:
-                    for valve in branch.valves_left:
-                        # Elephant stays put.
-                        add_branch(my_valve=valve, ele_valve=branch.ele_valve)
-                if branch.ele_time_left >= 2:
-                    for valve in branch.valves_left:
-                        # I stay put.
-                        add_branch(my_valve=branch.my_valve, ele_valve=valve)
+            if branch.my_time_left >= 2:
+                for valve in branch.valves_left:
+                    # Elephant stays put.
+                    add_branch(my_valve=valve, ele_valve=branch.ele_valve)
+            if branch.ele_time_left >= 2:
+                for valve in branch.valves_left:
+                    # I stay put.
+                    add_branch(my_valve=branch.my_valve, ele_valve=valve)
 
-        to_explore = next_to_explore
     return top_score
 
 
