@@ -43,7 +43,7 @@ class Cube:
             self.grid.append(list(row))
         self.size = 50  # Lazily hardcoding size; could infer from input.
         self.my_loc = C(self.grid[0].index("."))
-        self.my_dir = 0
+        self.my_dir = RIGHT
 
     def is_point_on_grid(self, p: C) -> bool:
         if p.imag < 0 or p.real < 0:
@@ -92,7 +92,7 @@ class Cube:
                     cur=next, want=want, dir=(dir + 1) % 4, skip=skip | {cur}
                 )
             elif move == (want + 2) % 4:
-                # In this situation, we want to keep track of the previous move made.
+                # In this situation, we want to keep track of the move we've just made.
                 # Let's just be gross and encode it into `dir`.
                 # Also note we're using 'nan' to denote "opposite side".
                 res = res or self.find_connecting_face(
@@ -108,10 +108,6 @@ class Cube:
                     skip=skip | {cur},
                 )
         return res
-
-    def draw(self):
-        for row in self.grid:
-            print("".join(row))
 
     def move_forward(self, n: int, wrap: str) -> None:
         for _ in range(n):
@@ -146,12 +142,12 @@ class Cube:
                     f, edir = self.find_connecting_face(
                         cur=self.my_loc // s * s, want=dir, dir=dir
                     )
-                    pf = loc // s * s  # the "phantom" face that l is on
+                    pf = loc // s * s  # the "phantom" face that loc is on
                     # Shift by delta between phantom face and target face.
                     loc += f - pf
                     # Rotate until dir matches target entry dir.
                     # NOTE: Cast to complex here, to allow decimal x/y vals when offsetting for polar.
-                    # (our "C" class snaps everything to the grid)
+                    # (our "C" class snaps everything to the grid!)
                     while dir != edir:
                         dir = (dir + 1) % 4
                         offset = complex(f) + (s - 1) / 2 + ((s - 1) / 2) * 1j
@@ -187,6 +183,10 @@ class Cube:
                 n_steps = instructions[:truncate]
                 cube.move_forward(int(n_steps), wrap=wrap)
             instructions = instructions[truncate:]
+
+    def draw(self):
+        for row in self.grid:
+            print("".join(row))
 
     def utter_password(self) -> int:
         return 1000 * (self.my_loc.imag + 1) + 4 * (self.my_loc.real + 1) + self.my_dir
