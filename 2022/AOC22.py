@@ -83,15 +83,6 @@ class Cube:
                 continue
             if move == want:
                 return next, dir
-            elif want is nan:
-                last_move = dir // 4
-                dir = dir % 4
-                res = res or self.find_connecting_face(
-                    cur=next,
-                    want=move,
-                    dir=dir if move == last_move else (dir + 2) % 4,
-                    skip=skip | {cur},
-                )
             elif move == (want - 1) % 4:
                 res = res or self.find_connecting_face(
                     cur=next, want=want, dir=(dir - 1) % 4, skip=skip | {cur}
@@ -106,6 +97,15 @@ class Cube:
                 # Also note we're using 'nan' to denote "opposite side".
                 res = res or self.find_connecting_face(
                     cur=next, want=nan, dir=dir + 4 * move, skip=skip | {cur}
+                )
+            elif want is nan:
+                last_move = dir // 4
+                dir = dir % 4
+                res = res or self.find_connecting_face(
+                    cur=next,
+                    want=move,
+                    dir=dir if move == last_move else (dir + 2) % 4,
+                    skip=skip | {cur},
                 )
         return res
 
