@@ -1,6 +1,6 @@
 import re
 
-lines = open("1").read().split("\n")
+lines = open("1").readlines()
 
 digit_map = {
     "one": 1,
