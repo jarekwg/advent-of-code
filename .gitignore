@@ -1,3 +1,4 @@
 */*
 !*.py
 !*.nim
+.DS_Store
