@@ -1,4 +1,5 @@
 */*
-!*.py
 !*.nim
+!*.py
+!*.ua
 .DS_Store
