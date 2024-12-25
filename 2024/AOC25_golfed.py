@@ -1,0 +1,1 @@
+import itertools as i;print(sum(all(not a[i]==b[i]=="#"for i in range(len(a)))for a,b in i.combinations(open("25").read().split("\n\n"),2)))
